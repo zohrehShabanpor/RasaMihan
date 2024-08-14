@@ -6,7 +6,6 @@ import useWebSocket, { Options, ReadyState } from "react-use-websocket";
 export type IUseSocketResponse = any;
 
 type IUseSocketOptions = Pick<Options, "onError" | "onOpen" | "onClose"> & {
-  defaultType?: any;
   onUnMount?: () => void;
   onOpenedMount?: () => void;
   onMessage?: (
@@ -42,17 +41,9 @@ export const useSocket = (options: IUseSocketOptions) => {
         | IUseSocketResponse
         | undefined;
       if (!lastMessage || !cachedOptions.current.onMessage) return;
-      if (Array.isArray(cachedOptions.current.defaultType)) {
-        if (cachedOptions.current.defaultType.includes(lastMessage.type))
-          cachedOptions.current.onMessage(lastMessage.data);
-      } else if (typeof cachedOptions.current.defaultType === "string") {
-        if (lastMessage.type === cachedOptions.current.defaultType)
-          cachedOptions.current.onMessage(lastMessage.data);
-      } else {
-        cachedOptions.current.onMessage(
-          lastMessage as Parameters<Required<IUseSocketOptions>["onMessage"]>[0]
-        );
-      }
+      cachedOptions.current.onMessage(
+        lastMessage as Parameters<Required<IUseSocketOptions>["onMessage"]>[0]
+      );
     } catch (error) {
       throw new Error(error as string);
     }
